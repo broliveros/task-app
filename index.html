@@ -35,6 +35,15 @@
          </div>
         <script src="script.js"></script>
         <script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>
+        <script>
+            document.addEventListener("DOMContentLoaded", () => {
+                flatpickr("#due-date", {
+                    dateFormat: "Y-m-d",
+                    allowInput: true,
+                    disableMobile: true
+                });
+            });
+        </script>
     </body>
 </html>
 
