@@ -3,11 +3,6 @@ document.addEventListener("DOMContentLoaded", () => {
     const input = document.getElementById("task-input");
     const list = document.getElementById("task-list");
 
-    flatpickr("#due-date", {
-        dateFormat: "Y-m-d",
-        allowInput: true,
-    });
-
     const filterButtons = document.querySelectorAll("#filter-buttons button");
     let currentFilter = "all";
 
@@ -222,6 +217,11 @@ document.addEventListener("DOMContentLoaded", () => {
             { offset: Number.NEGATIVE_INFINITY, element: null }
         ).element;
     }
+    
+    flatpickr("#due-date", {
+        dateFormat: "Y-m-d",
+        allowInput: true,
+    });
     
         form.addEventListener("submit", (e) => {
         e.preventDefault();
