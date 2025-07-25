@@ -1,4 +1,9 @@
 document.addEventListener("DOMContentLoaded", () => {
+    flatpickr("#due-date", {
+        dateFormat: "Y-m-d",
+        allowInput: true
+    });
+    
     const form = document.getElementById("task-form");
     const input = document.getElementById("task-input");
     const list = document.getElementById("task-list");
@@ -217,12 +222,7 @@ document.addEventListener("DOMContentLoaded", () => {
             { offset: Number.NEGATIVE_INFINITY, element: null }
         ).element;
     }
-    
-    flatpickr("#due-date", {
-        dateFormat: "Y-m-d",
-        allowInput: true,
-    });
-    
+
         form.addEventListener("submit", (e) => {
         e.preventDefault();
         const taskText = input.value.trim();

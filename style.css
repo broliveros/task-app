@@ -48,27 +48,13 @@ button {
     box-sizing: border-box;
 }
 
-inputp[type="date"] {
-    appearance: none;
-    -webkit-appearance: none;
-    background-color: #fff;
+#due-date {
+    height: 44px;
+    padding: 10px 15px;
+    font-size: 1rem;
     border: 1px solid #ccc;
     border-radius: 5px;
-    padding: 0 10px;
-    font-size: 1rem;
-    height: 44px;
-    color: #333;
-    width: 120px;
-}
-
-input[type="date"]::before {
-    content: attr(placeholder);
-    color: #888;
-}
-
-input[type="date"]:focus::before,
-input[type="date"]:valid::before {
-    content:"" !important;
+    width: 100%;
 }
 
 #add-task-btn {
