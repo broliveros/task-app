@@ -38,6 +38,31 @@ form.form-row button {
     box-sizing: border-box;
 }
 
+.date-input {
+    min-width: 140px;
+    padding: 8px;
+    border: 1px solid #ccc;
+    border-radius: 5px;
+    background-color: white;
+    color: #999;
+    font-size: 1rem;
+    appearance: none;
+}
+
+.date-input:valid {
+    color: black;
+}
+
+.date-input:invalid::before {
+    content: attr(placeholder);
+    color: #999;
+}
+
+.date-input::-webkit-calendar-picker-indicator {
+    cursor: pointer;
+    opacity: 0.6;
+}
+
 input[type="text"],
 button {
     height: 44px;
