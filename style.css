@@ -64,22 +64,16 @@ form.form-row button {
 }
 
 input[type="text"],
-button {
+input[type="date"],
+input[type="search"],
+select {
     height: 44px;
-    padding: 10 15px;
+    padding: 0 12px;
     font-size: 1rem;
-    border: 1px solid #ccc;
-    border-radius: 5px;
-    box-sizing: border-box;
-}
-
-#due-date {
-    height: 44px;
-    padding: 10px 15px;
-    font-size: 1rem;
-    border: 1px solid #ccc;
-    border-radius: 5px;
     width: 100%;
+    box-sizing: border-box;
+    border-radius: 5px;
+    border: 1px solid #ccc;
 }
 
 #add-task-btn {
