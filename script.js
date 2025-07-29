@@ -206,6 +206,41 @@ document.addEventListener("DOMContentLoaded", () => {
         }
     });
 
+    let touchStartY = 0;
+
+    list.querySelectorAll("li").forEach((item) => {
+        item.addEventListener("touchstart", (e) => {
+            touchStartY = e.touches[0].clientY;
+            draggedItem = item;
+            item.classList.add("dragging");
+        });
+
+        item.addEventListener("touchmove", e => {
+            e.preventDefault();
+            const touchY = e.touches[0].clientY;
+            const afterElement = getDragAfterElement(list, touchY);
+            if (afterElement == null) {
+                list.appendChild(draggedItem);
+            } else {
+                list.insertBefore(draggedItem, afterElement);
+            }
+        });
+
+        item.addEventListener("touchend", () => {
+            if (draggedItem) draggedItem.classList.remove("dragging");
+            draggedItem = null;
+
+            const newOrder = Array.from(list.querySelectorAll("li")).map(li => {
+                return tasks.find(t => t.id === parseInt(li.dataset.id));
+            });
+
+            const hiddenTasks = tasks.filter(t => !newOrder.includes(t));
+            tasks = [...newOrder, ...hiddenTasks];
+            saveTasks();
+            renderTasks(currentFilter);
+        });
+    });
+
     function getDragAfterElement(container, y) {
         const draggableElements = [...container.querySelectorAll("li:not(.dragging)")];
 
