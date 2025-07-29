@@ -3,7 +3,7 @@ document.addEventListener("DOMContentLoaded", () => {
         dateFormat: "Y-m-d",
         allowInput: true
     });
-    
+
     const form = document.getElementById("task-form");
     const input = document.getElementById("task-input");
     const list = document.getElementById("task-list");
@@ -221,6 +221,46 @@ document.addEventListener("DOMContentLoaded", () => {
             },
             { offset: Number.NEGATIVE_INFINITY, element: null }
         ).element;
+    }
+
+    const taskList = document.getElementById('task-list');
+    let draggedItem = null;
+    let touchOffsety = 0;
+
+    function handleDragStart(e) {
+        draggedItem = e.target;
+        e.dataTransfer?.setData('text/plain', '');
+        setTimeout(() => {
+            draggedItem.classList.add('dragging');
+        }, 0);
+    }
+
+    function handleDragEnd() {
+        if (draggedItem) draggedItem.classList.remove('dragging');
+        draggedItem = null;
+    }
+
+    function handleDragOver(e) {
+        e.preventDefault(); 
+        const afterElement = getDragAfterElement(taskList, e.clientY);
+        if (afterElement == null) {         
+            taskList.appendChild(draggedItem);
+        } else {
+            taskList.insertBefore(draggedItem, afterElement);   
+        }
+    }
+
+    function getDragAfterElement(container, y) {
+        const draggableElements = [...container.querySelectorAll("li:not(.dragging)")];
+        return draggableElements.reduce((closest, child) => {
+            const box = child.getBoundingClientRect();
+            const offset = y - box.top - box.height / 2;
+            if (offset < 0 && offset > closest.offset) {
+                return { offset: offset, element: child };
+            } else {
+                return closest;
+            }
+        }, { offset: Number.NEGATIVE_INFINITY, element: null }).element;
     }
 
         form.addEventListener("submit", (e) => {

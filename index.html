@@ -13,7 +13,12 @@
 
             <form id="task-form" class="form-row">
                 <input type="text" id="task-input" placeholder="Enter a new task" />
-                <input type="date" id="due-date" class="date-input" required />
+                <input 
+                type="date" 
+                id="due-date" 
+                class="date-input" 
+                required
+                placeholder="Date" />
                 <select id="priority">
                     <option value="low" selected>Low</option>
                     <option value="medium">Medium</option>
@@ -31,7 +36,11 @@
             </div>
                 <input type="text" id="search-input" placeholder="Search tasks. . ." />
 
-            <ul id="task-list"></ul>
+            <ul id="task-list">
+                <li draggable="true">Task 1</li>
+                <li draggable="true">Task 2</li>
+                <li draggable="true">Task 3</li>
+            </ul>
          </div>
         <script src="script.js"></script>
         <script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>
