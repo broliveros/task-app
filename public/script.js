@@ -69,7 +69,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
         visibleTasks.forEach((task) => {
             const li = document.createElement("li");
-            li.dataset.id = task.id;
+            li.dataset.id = task._id;
             li.setAttribute("draggable", "true");
         
             const now = new Date();
@@ -156,7 +156,7 @@ document.addEventListener("DOMContentLoaded", () => {
             deleteBtn.textContent = "X";
             deleteBtn.className = "delete-btn";
             deleteBtn.addEventListener("click", () => {
-                tasks = tasks.filter((t) => t.id !== task.id);
+                tasks = tasks.filter((t) => t._id !== task.id);
                 saveTasks();
                 renderTasks(activeFilter);
             });
@@ -192,7 +192,7 @@ document.addEventListener("DOMContentLoaded", () => {
             e.target.classList.remove("dragging");
 
             const visibleOrder = Array.from(list.querySelectorAll("li")).map((li) => {
-                return tasks.find((t) => t.id === parseInt(li.dataset.id, 10));
+                return tasks.find((t) => t._id === parseInt(li.dataset.id, 10));
             });
 
             const hiddenTasks = tasks.filter((t) => !visibleOrder.includes(t));
@@ -245,7 +245,7 @@ document.addEventListener("DOMContentLoaded", () => {
             draggedItem = null;
 
             const newOrder = Array.from(list.querySelectorAll("li")).map(li => {
-                return tasks.find(t => t.id === parseInt(li.dataset.id));
+                return tasks.find(t => t._id === parseInt(li.dataset.id));
             });
 
             const hiddenTasks = tasks.filter(t => !newOrder.includes(t));
@@ -333,7 +333,7 @@ document.addEventListener("DOMContentLoaded", () => {
                     })
                 });
 
-                if (!res.ok) throw new Error("Failed to create task");
+                if (!response.ok) throw new Error("Failed to create task");
 
                 const newTask = await response.json();
                 tasks.push(newTask);
@@ -341,7 +341,8 @@ document.addEventListener("DOMContentLoaded", () => {
             } catch (error) {
                 console.error("Error creating task:", error);
             }
-        })();
+        });
+        
     input.value = "";
     document.getElementById("due-date").value = "";
 });
