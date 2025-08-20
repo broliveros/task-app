@@ -35,8 +35,26 @@ document.addEventListener("DOMContentLoaded", () => {
         try {
             const res = await fetch("http://localhost:5000/api/tasks");
             if (!res.ok) throw new Error("Failed to fetch tasks");
-            tasks = await res.json();
-            renderTasks();
+
+        const rawTasks = await res.json();
+        console.log("Backend tasks:", rawTasks); 
+
+        function formatDate(dateString) {
+            if (!dateString) return "";
+            const date = new Date(dateString);
+            return date.toISOString().split("T")[0]; 
+        }
+
+        tasks = rawTasks.map(t => ({
+            _id: t._id,
+            text: t.text || t.title || "Untitled Task",  
+            completed: t.completed ?? false,             
+            dueDate: t.dueDate || null,                  
+            priority: t.priority || "low",               
+            description: t.description || ""            
+        }));
+
+        renderTasks();
         } catch (error) {
             console.error("Error loading tasks:", error);
         }
@@ -45,10 +63,32 @@ document.addEventListener("DOMContentLoaded", () => {
 
     loadTasksFromBackend();
 
-    function saveTasks() {
-        localStorage.setItem("tasks", JSON.stringify(tasks));
-    }
+    async function updateTask(task) {
+    await fetch(`http://localhost:5000/api/tasks/${task._id}`, {
+        method: "PUT",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(task)
+    });
+}
 
+async function deleteTask(id) {
+    const BASE_URL = "http://localhost:5000/api/tasks"; 
+    try {
+        const response = await fetch(`${BASE_URL}/${id}`, {
+            method: 'DELETE'
+        });
+
+        if (response.ok) {
+            tasks = tasks.filter(task => task._id !== id);
+            renderTasks();
+        } else {
+            const error = await response.json();
+            console.error("Failed to delete:", error.message);
+        }
+    } catch (err) {
+        console.error("Error deleting task:", err);
+    }
+}
     function renderTasks(activeFilter = currentFilter) {
         list.innerHTML = "";
 
@@ -88,15 +128,20 @@ document.addEventListener("DOMContentLoaded", () => {
             checkbox.checked = task.completed;
             checkbox.addEventListener("change", () => {
                 task.completed = checkbox.checked;
-                saveTasks();
                 renderTasks(activeFilter);
             });
 
             const priorityBadge = `<span class="priority-badge ${task.priority}">${task.priority}</span>`;
 
+           function formatDate(dateString) {
+                if (!dateString) return "";
+                const date = new Date(dateString);
+                return date.toISOString().split("T")[0];
+        }
+
             const span = document.createElement("span");
             span.innerHTML = task.dueDate
-            ? `${task.text} ${priorityBadge}<br><small style="color: gray;"><em>Due: ${task.dueDate}</em></small>`
+            ? `${task.text} ${priorityBadge}<br><small style="color: gray;"><em>Due: ${formatDate(task.dueDate)}</em></small>`
             : `${task.text} ${priorityBadge}`;
 
             if (task.completed) span.classList.add("completed");
@@ -136,12 +181,11 @@ document.addEventListener("DOMContentLoaded", () => {
                     task.text = editInput.value.trim();
                     task.dueDate = editDate.value;
                     task.priority = editPriority.value;
-                    saveTasks();
                     renderTasks(activeFilter);
                 });
 
                 cancelBtn.addEventListener("click", () => {
-                    renderTasks(filter);
+                    renderTasks(activeFilter);
                 });
 
             li.appendChild(checkbox);
@@ -155,11 +199,9 @@ document.addEventListener("DOMContentLoaded", () => {
             const deleteBtn = document.createElement("button");
             deleteBtn.textContent = "X";
             deleteBtn.className = "delete-btn";
-            deleteBtn.addEventListener("click", () => {
-                tasks = tasks.filter((t) => t._id !== task.id);
-                saveTasks();
-                renderTasks(activeFilter);
-            });
+           deleteBtn.addEventListener("click", async () => {
+                 await deleteTask(task._id); 
+        });
 
                 const contentDiv = document.createElement("div");
                 contentDiv.className = "task-content";
@@ -192,14 +234,13 @@ document.addEventListener("DOMContentLoaded", () => {
             e.target.classList.remove("dragging");
 
             const visibleOrder = Array.from(list.querySelectorAll("li")).map((li) => {
-                return tasks.find((t) => t._id === parseInt(li.dataset.id, 10));
+                return tasks.find((t) => t._id === (li.dataset.id));
             });
 
             const hiddenTasks = tasks.filter((t) => !visibleOrder.includes(t));
             
             tasks = [...visibleOrder, ...hiddenTasks];
 
-            saveTasks();
             renderTasks(currentFilter);
              }
         });
@@ -250,7 +291,6 @@ document.addEventListener("DOMContentLoaded", () => {
 
             const hiddenTasks = tasks.filter(t => !newOrder.includes(t));
             tasks = [...newOrder, ...hiddenTasks];
-            saveTasks();
             renderTasks(currentFilter);
         });
     });
@@ -335,13 +375,24 @@ document.addEventListener("DOMContentLoaded", () => {
 
                 if (!response.ok) throw new Error("Failed to create task");
 
-                const newTask = await response.json();
-                tasks.push(newTask);
-                renderTasks(currentFilter);
+                const rawNewTask = await response.json();
+
+        const formattedTask = {
+            _id: rawNewTask._id,
+            text: rawNewTask.text || rawNewTask.title || "Untitled Task",
+            completed: rawNewTask.completed ?? false,
+            dueDate: rawNewTask.dueDate || null,
+            priority: rawNewTask.priority || "low",
+            description: rawNewTask.description || ""
+    };
+
+        tasks.push(formattedTask);
+        renderTasks(currentFilter);
+
             } catch (error) {
                 console.error("Error creating task:", error);
             }
-        });
+        })();
         
     input.value = "";
     document.getElementById("due-date").value = "";
@@ -349,7 +400,6 @@ document.addEventListener("DOMContentLoaded", () => {
 
     document.getElementById("clear-completed-btn").addEventListener("click", () => {
         tasks = tasks.filter((task) => !task.completed);
-        saveTasks();
         renderTasks();
     });
    }
